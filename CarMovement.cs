@@ -49,7 +49,7 @@ public class CarMovement : MonoBehaviour
         horizontalInput = Input.GetAxis("Steering");
         verticalInput = Input.GetAxisRaw("GasPedal");
         isBreaking = Input.GetAxisRaw("BrakePedal");
-        //Debug.Log("brake Pedal Input: " + isBreaking);
+        //Debug.Log("Brake Pedal Input: " + isBreaking);
     }
 
 
@@ -68,12 +68,12 @@ public class CarMovement : MonoBehaviour
         currentbreakForce = isBreaking != 1f ? breakForce : 0f; // Apply breaking only if isBreaking is not equal to 1
         //currentbreakForce = isBreaking != 1f ? isTerTrue : isTerFalse;
         //Debug.Log("ANS: " + currentbreakForce);
-        ApplyBreaking();          
+        ApplyBreaking();           
     }
 
     private void ApplyBreaking()
 {
-    if (isBreaking > 1f) {
+    if (isBreaking != 1f) {
         // Gradually increase the brake force up to the maximum over a certain duration
         currentbreakForce = Mathf.MoveTowards(currentbreakForce, breakForce, Time.fixedDeltaTime * (breakForce / breakDuration));
 
@@ -97,28 +97,19 @@ public class CarMovement : MonoBehaviour
 
    private void HandleSteering()
 {
-    
     float rawInput = Input.GetAxisRaw("Steering"); // Get the raw input value from the G920 steering wheel
     float input = Mathf.Clamp(rawInput, -1f, 1f); // Clamp the input value between -1 and 1
-    
-    float speedFactor = Mathf.Clamp01(GetComponent<Rigidbody>().velocity.magnitude / accelerationFactor); // Calculate the speed factor
-    currentSteerAngle = Mathf.Lerp(minSteerAngle, maxSteerAngle, speedFactor) * input;
 
+    currentSteerAngle = Mathf.Lerp(minSteerAngle, maxSteerAngle, Mathf.Abs(input)) * Mathf.Sign(input);
+    Debug.Log("currentSteerAngle" + currentSteerAngle);
 
-    //float targetSteerAngle = Mathf.Lerp(minSteerAngle, maxSteerAngle, speedFactor); // Calculate the target maximum steering angle using the speed factor
-
-    //currentSteerAngle = (targetSteerAngle * horizontalInput) / steeringSensitivity;
-
-    //Debug.Log(horizontalInput);
-    //Debug.Log(currentSteerAngle);
     if (Mathf.Abs(currentSteerAngle) < deadZone) {
-        horizontalInput = 0f;
+        input = 0f;
     }
 
     frontLeftWheelCollider.steerAngle = currentSteerAngle / steeringSensitivity;
     frontRightWheelCollider.steerAngle = currentSteerAngle / steeringSensitivity;
 }
-
 
 
 
