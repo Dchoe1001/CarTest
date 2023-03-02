@@ -47,23 +47,33 @@ public class CarMovement : MonoBehaviour
     private void GetInput()
     {
         horizontalInput = Input.GetAxis("Steering");
-        verticalInput = Input.GetAxis("A Button");
-        isBreaking = Input.GetAxis("B Button");
-        //Debug.Log("Gas Pedal Input: " + verticalInput);
+        verticalInput = Input.GetAxisRaw("GasPedal");
+        isBreaking = Input.GetAxisRaw("BrakePedal");
+        //Debug.Log("brake Pedal Input: " + isBreaking);
     }
 
 
     private void HandleMotor()
     {
-        frontLeftWheelCollider.motorTorque = verticalInput * motorForce;
-        frontRightWheelCollider.motorTorque = verticalInput * motorForce;
-        currentbreakForce = isBreaking > 0.5f ? breakForce : 0f; // Apply breaking only if isBreaking is greater than 0.5f
+        //float isTerTrue = 1;
+        //float isTerFalse = 0;
+        if(verticalInput < 0f) {
+            frontLeftWheelCollider.motorTorque = -verticalInput * motorForce;
+            frontRightWheelCollider.motorTorque = -verticalInput * motorForce;
+        }
+        else {
+            frontLeftWheelCollider.motorTorque = 0;
+            frontRightWheelCollider.motorTorque = 0;
+        }
+        currentbreakForce = isBreaking != 1f ? breakForce : 0f; // Apply breaking only if isBreaking is not equal to 1
+        //currentbreakForce = isBreaking != 1f ? isTerTrue : isTerFalse;
+        //Debug.Log("ANS: " + currentbreakForce);
         ApplyBreaking();          
     }
 
     private void ApplyBreaking()
 {
-    if (isBreaking > 0.5f) {
+    if (isBreaking > 1f) {
         // Gradually increase the brake force up to the maximum over a certain duration
         currentbreakForce = Mathf.MoveTowards(currentbreakForce, breakForce, Time.fixedDeltaTime * (breakForce / breakDuration));
 
@@ -100,7 +110,7 @@ public class CarMovement : MonoBehaviour
     //currentSteerAngle = (targetSteerAngle * horizontalInput) / steeringSensitivity;
 
     //Debug.Log(horizontalInput);
-    Debug.Log(currentSteerAngle);
+    //Debug.Log(currentSteerAngle);
     if (Mathf.Abs(currentSteerAngle) < deadZone) {
         horizontalInput = 0f;
     }
