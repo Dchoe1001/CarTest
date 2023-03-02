@@ -1,0 +1,9 @@
+BrakePedal
+type axis
+axis 4th
+num 1
+
+GasPedal
+type axis
+axis y
+num 1
